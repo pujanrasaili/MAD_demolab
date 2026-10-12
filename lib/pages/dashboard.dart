@@ -7,10 +7,10 @@ class dashboard extends StatefulWidget {
   const dashboard({super.key});
 
   @override
-  State<dashboard> createState() => _dashboardState();
+  State<dashboard> createState() => dashboardState();
 }
 
-class _dashboardState extends State<dashboard> {
+class dashboardState extends State<dashboard> {
 
   horizontallistitem(size, String title,url, date){
     return GestureDetector(
@@ -71,7 +71,7 @@ class _dashboardState extends State<dashboard> {
     );
   }
 
-  verticallistitem(size, String title, url, date, source){
+  static verticallistitem(size, String title, url, date, source){
     return Row(
       children: [
         Stack(
