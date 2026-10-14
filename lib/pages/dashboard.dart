@@ -1,3 +1,4 @@
+import 'package:xyzseasonsir/controller/apicall.dart';
 import 'package:xyzseasonsir/pages/detailpage.dart';
 import 'package:flutter/material.dart';
 
@@ -11,6 +12,12 @@ class dashboard extends StatefulWidget {
 }
 
 class dashboardState extends State<dashboard> {
+
+  @override
+  void initState() {
+    super.initState();
+      Apicall().getnewsdata();
+  }
 
   horizontallistitem(size, String title,url, date){
     return GestureDetector(
