@@ -2,6 +2,7 @@ import 'package:xyzseasonsir/controller/apicall.dart';
 import 'package:xyzseasonsir/pages/detailpage.dart';
 import 'package:flutter/material.dart';
 
+import '../model/news.dart';
 import 'detailpage.dart';
 
 class dashboard extends StatefulWidget {
@@ -13,10 +14,11 @@ class dashboard extends StatefulWidget {
 
 class dashboardState extends State<dashboard> {
 
+  Future<news?>? futurenewsdata;
   @override
   void initState() {
     super.initState();
-      Apicall().getnewsdata();
+      futurenewsdata=Apicall().getnewsdata();
   }
 
   horizontallistitem(size, String title,url, date){
@@ -148,77 +150,71 @@ class dashboardState extends State<dashboard> {
       appBar: AppBar(),
       body: Column(
         children: [
-          //horizontal scroll items
-          SingleChildScrollView(
-            scrollDirection: Axis.horizontal,
-            child: Row(
-              children: [
-
-                horizontallistitem(size,
-                    "Muchas Gracia",
-                    "https://media.gettyimages.com/id/479481344/photo/chile-v-argentina-"
-                        "2015-copa-america-chile-final.jpg?s=2048x2048&w=gi&k=20&c=6eOsW"
-                        "YzbAQHZvR2Sk9fWpkM0csau0YYp1_m-HKJylMY=",
-                    "03 feb 2026"),
-                horizontallistitem(size,
-                    "Muchas Gracia",
-                    "https://media.gettyimages.com/id/479481344/photo/chile-v-argentina-"
-                        "2015-copa-america-chile-final.jpg?s=2048x2048&w=gi&k=20&c=6eOsW"
-                        "YzbAQHZvR2Sk9fWpkM0csau0YYp1_m-HKJylMY=",
-                    "04 feb 2026"),
-                horizontallistitem(size,
-                    "Muchas Gracia",
-                    "https://media.gettyimages.com/id/479481344/photo/chile-v-argentina-"
-                        "2015-copa-america-chile-final.jpg?s=2048x2048&w=gi&k=20&c=6eOsW"
-                        "YzbAQHZvR2Sk9fWpkM0csau0YYp1_m-HKJylMY=",
-                    "05 feb 2026"),
-                horizontallistitem(size,
-                    "Muchas Gracia",
-                    "https://media.gettyimages.com/id/479481344/photo/chile-v-argentina-"
-                        "2015-copa-america-chile-final.jpg?s=2048x2048&w=gi&k=20&c=6eOsW"
-                        "YzbAQHZvR2Sk9fWpkM0csau0YYp1_m-HKJylMY=",
-                    "06 feb 2026"),
-              ],
-            ),
-          ),
+          FutureBuilder(
+              future: futurenewsdata,
+              builder: (context, AsyncSnapshot<news?> snapshot){
+                switch (snapshot.connectionState){
+                  case ConnectionState.active:
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                    return CircularProgressIndicator();
+                  case ConnectionState.done:
+                    if(snapshot.hasData){
+                      var data = snapshot.data;
+                      //ui dekhaaune
+                      return Column(
+                        children: [Container(
+                          height: size.height / 4,
+                          child: ListView.builder(
+                            padding: EdgeInsets.zero,
+                            scrollDirection: Axis.horizontal, // Added this since it's a horizontal list item
+                            itemCount: data!.articles!.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return horizontallistitem(size,
+                                  data.articles![index].title!.toUpperCase(),
+                                  data.articles![index].urlToImage,
+                                  data.articles![index].publishedAt!.split("T")[0],
+                              );
+                            },
+                          ),
+                        ),]
+                      );
+                    }else{
+                      return Center(child: Text("No Data"),);
+                    }
+                }
+              }),
 
           //vertical scroll items
           Container(
             height: size.height/1.6,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  verticallistitem(size,
-                      " happy dashain pcps family skdalsjdajd",
-                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNBJaFUb3pMu0XkkBdNkmsaBuZoYsR78LNMLGEdLPig&s=10",
-                      "02 feb 2026",
-                      "PCPSNEWS"),
-                  verticallistitem(size,
-                      "title  dashain pcps family skdalsjdajd",
-                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNBJaFUb3pMu0XkkBdNkmsaBuZoYsR78LNMLGEdLPig&s=10",
-                      "02 feb 2026",
-                      "PCPSNEWS"),
-                  verticallistitem(size,
-                      "title happy  pcps family skdalsjdajd",
-                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNBJaFUb3pMu0XkkBdNkmsaBuZoYsR78LNMLGEdLPig&s=10",
-                      "02 feb 2026",
-                      "PCPSNEWS"),
-                  verticallistitem(size,
-                      "title happy dashain family ",
-                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNBJaFUb3pMu0XkkBdNkmsaBuZoYsR78LNMLGEdLPig&s=10",
-                      "02 feb 2026",
-                      "PCPSNEWS"),
-                  verticallistitem(size,
-                      "title happy",
-                      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNBJaFUb3pMu0XkkBdNkmsaBuZoYsR78LNMLGEdLPig&s=10",
-                      "02 feb 2026",
-                      "PCPSNEWS"),
+            child: FutureBuilder(
+              future: futurenewsdata,
+              builder: (context, AsyncSnapshot<news?> snapshot) {
+                if (snapshot.hasData) {
+                  var data = snapshot.data;
 
-                ],
-              ),
+                  return ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    itemCount: data!.articles!.length,
+                    itemBuilder: (BuildContext context, int index) {
+                      return verticallistitem(
+                        size,
+                        data.articles![index].title!.toUpperCase(),
+                        data.articles![index].urlToImage,
+                        data.articles![index].publishedAt!.split("T")[0],
+                        data.articles![index].source!.name!,
+                      );
+                    },
+                  );
+                } else {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+              },
             ),
           ),
-
         ],
       ),
     );
