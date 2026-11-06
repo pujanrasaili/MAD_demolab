@@ -1,5 +1,10 @@
+import 'package:demopcpsseca/controller/apicall.dart';
+import 'package:demopcpsseca/core/staticfile.dart';
+import 'package:demopcpsseca/model/news.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'dashboard.dart';
+
 class detailpage extends StatefulWidget {
   const detailpage({super.key});
 
@@ -8,9 +13,17 @@ class detailpage extends StatefulWidget {
 }
 
 class _detailpageState extends State<detailpage> {
+
+  Future<news?>? futurenewsdata;
+  @override
+  void initState() {
+    super.initState();
+    futurenewsdata = Apicall().getnewsdata();
+  }
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    var data = Staticfile.article;
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -21,82 +34,129 @@ class _detailpageState extends State<detailpage> {
                 Container(
                   height: size.height/4,
                   width: size.width,
-                  child: Image.network(fit: BoxFit.cover,"https://media.gettyimages.com/id/479481344/photo/chile-v-argentina-"
-                      "2015-copa-america-chile-final.jpg?s=2048x2048&w=gi&k=20&c=6eOsW"
-                "YzbAQHZvR2Sk9fWpkM0csau0YYp1_m-HKJylMY=")
+                  child: Image.network(fit: BoxFit.cover,
+                  data!.urlToImage!
+
+                )
                 ),
                 Container(
-                  height: size.height/4,
-                  width: size.width,
-                  color: Colors.black54,
+                    height: size.height/4,
+                    width: size.width,
+                    color: Colors.black54,
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon( Icons.arrow_back,color: Colors.white,size: 40,),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Icon( Icons.arrow_back,color: Colors.white,size: 40,),
+                GestureDetector(
+                  onTap: (){
+                    Navigator.pop(context);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Icon(Icons.arrow_back,color: Colors.white,size: 40,),
+                  ),
                 ),
                 Positioned(
                   right: 10,
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Icon(Icons.share,color: Colors.white,size: 40,),
-                  )
+                  child: GestureDetector(
+                    onTap: (){
+                      SharePlus.instance.share(
+                          ShareParams(text: data.title! + " "
+                              + data.url!)
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(Icons.share,color: Colors.white,size: 40,),
+                    ),
+                  ),
                 ),
                 Container(
                   height: size.height/4,
                   width: size.width,
                   child: Center(
-                    child: Icon(Icons.play_circle_fill_rounded,color: Colors.white,size: 40,),
-                  )
+                    child: Icon(Icons.play_circle_fill,size: 60,color: Colors.white,),
+                  ),
                 )
+
               ],
             ),
             SizedBox(height: 15,),
             Padding(
               padding: const EdgeInsets.all(15.0),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 crossAxisAlignment: CrossAxisAlignment.start,
-
-              children: [
-                Text("Happy Dashain Everyone",style: TextStyle(fontSize: 20,fontWeight: FontWeight.bold),maxLines: 2, overflow: TextOverflow.ellipsis,),
-                SizedBox(height: 10,),
-                Row(
-                  children: [
-                    Text("Author Name"),
-                    Text("02 02 2026")
-                  ],
-                )
-              ]
-            ),),
-
-            Divider(),
-
-                Row(
-            children: [
-        Text("Related Videos",style: TextStyle(fontSize: 18)
-        )],
+                children: [
+                  Text(data.title!
+                  ,style: TextStyle(fontSize: 20,
+                        fontWeight: FontWeight.bold),maxLines: 2,
+                  overflow: TextOverflow.ellipsis,),
+                  SizedBox(height: 10,),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(data.author!),
+                      Text(Staticfile.dateconverter(data.publishedAt!))
+                    ],
+                  ),
+                  SizedBox(height: 10,),
+                  Text(data.description!)
+                ],
+              ),
             ),
-           dashboardState.verticallistitem(size,
-            "title happy  pcps family skdalsjdajd",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNBJaFUb3pMu0XkkBdNkmsaBuZoYsR78LNMLGEdLPig&s=10",
-            "02 feb 2026",
-            "PCPSNEWS"),
-            dashboardState.verticallistitem(size,
-            "title happy  pcps family skdalsjdajd",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNBJaFUb3pMu0XkkBdNkmsaBuZoYsR78LNMLGEdLPig&s=10",
-            "02 feb 2026",
-            "PCPSNEWS"),
-            dashboardState.verticallistitem(size,
-            "title happy  pcps family skdalsjdajd",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRYNBJaFUb3pMu0XkkBdNkmsaBuZoYsR78LNMLGEdLPig&s=10",
-            "02 feb 2026",
-            "PCPSNEWS"),
-          ],),
-      )
+            Padding(
+              padding: const EdgeInsets.only(left: 15.0,right: 15),
+              child: Divider(),
+            ),
+            Row(
+              children: [
+                SizedBox(width: 15,),
+                Text("Related Videos",style: TextStyle(fontSize: 18),),
+              ],
+            ),
+
+            FutureBuilder(
+                future: futurenewsdata,
+                builder: (context, AsyncSnapshot<news?> snapshot ){
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.active:
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                      return CircularProgressIndicator();
+                    case ConnectionState.done:
+                      if(snapshot.hasData){
+                        var data = snapshot.data;
+                        //ui dekhaune
+                        return Column(
+                          children: [
+
+                            Container(
+                              height: size.height/1.6,
+                              child: ListView.builder(
+                                  padding: EdgeInsets.zero,
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: data!.articles!.length,
+                                  itemBuilder: (BuildContext context, int index) {
+                                    return  dashboardState.verticallistitem(
+                                        context,size,
+                                        data.articles![index].title!.toUpperCase(),
+                                        data.articles![index].urlToImage,
+                                        data.articles![index].publishedAt!.split("T")[0],
+                                        data.articles![index].source!.name,
+                                        data.articles![index]);
+                                  }
+                              ),
+                            ),
+                          ],
+                        );
+                      }else{
+                        return Center(child: Text("No Data"),);
+                      }
+                  }
+                }),
+
+
+
+          ],
+        ),
+      ),
 
     );
   }
